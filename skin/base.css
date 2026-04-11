@@ -6,13 +6,12 @@
 
 [data-theme="dark"] {
     --bg-color: #1a1a1a;
-    --text-color: #f4f4f4;
+    --text-color: #f4f4f4;  /* Light text for dark background */
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    transition: background-color 0.3s ease; /* Smooth transition */
 }
 
 /* Removes default browser margins */
