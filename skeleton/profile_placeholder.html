@@ -10,11 +10,7 @@
 <body>
 
     <div class="profile-container">
-        <div class="profile-header">
-            <div class="profile-picture"></div>
-            <h1 class="username" id="sig-name">User Name</h1>
-            <p class="bio">Short bio or user description goes here.</p>
-        </div>
+        <div id="profile-header-container"></div>
 
         <div class="profile-details">
             <div class="detail-item">
@@ -32,6 +28,15 @@
             <button type="button">Edit Profile</button>
         </div>
     </div>
-<script src="/subsystems/router.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('profile-header-container');
+            if (container && typeof renderProfileHeader === 'function') {
+                container.innerHTML = renderProfileHeader();
+                console.log("%c Phase 1.5: Profile Header Injected", "color: #ffc107; font-weight: bold;");
+            }
+        });
+    </script>
+    <script src="/subsystems/router.js"></script>
 </body>
 </html>
