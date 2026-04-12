@@ -1,13 +1,33 @@
-// Phase 3.2: Shadow DOM Implementation
+// Phase 3.3 Refined: Persistent Attribute Reflection
 class NavBar extends HTMLElement {
     constructor() {
         super();
-        // Attach a shadow root to the element 
         this.attachShadow({ mode: 'open' });
     }
 
+    static get observedAttributes() {
+        return ['mode'];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Save the choice to localStorage whenever the attribute is set
+        if (name === 'mode') {
+            localStorage.setItem('nav-mode', newValue);
+        }
+        this.render();
+    }
+
     connectedCallback() {
+        // FIXED: When the component loads on a new page, pull the saved mode
+        const savedMode = localStorage.getItem('nav-mode') || 'full';
+        this.setAttribute('mode', savedMode);
+        this.render();
+    }
+
+    render() {
         const currentPath = window.location.pathname;
+        const mode = this.getAttribute('mode') || 'full';
+        
         const links = [
             { name: "Home", href: "/index.html" },
             { name: "Vents | Problems", href: "/skeleton/problem_placeholder.html" },
@@ -15,13 +35,15 @@ class NavBar extends HTMLElement {
             { name: "Profile", href: "/skeleton/profile_placeholder.html" }
         ];
 
-        // The innerHTML is now set on the shadowRoot, not the element itself
+        const filteredLinks = mode === 'minimal' 
+            ? links.filter(l => l.name === "Home" || l.name === "Profile") 
+            : links;
+
         this.shadowRoot.innerHTML = `
             <style>
-                /* These styles are now encapsulated and won't leak out  */
                 nav {
                     background: #333;
-                    padding: 10px;
+                    padding: ${mode === 'minimal' ? '5px' : '10px'};
                     display: flex;
                     justify-content: center;
                 }
@@ -32,26 +54,20 @@ class NavBar extends HTMLElement {
                     font-family: sans-serif;
                     font-weight: bold;
                     transition: color 0.3s ease;
+                    font-size: ${mode === 'minimal' ? '0.8rem' : '1rem'};
                 }
-                .nav-links a:hover, .nav-links a.active {
-                    color: white;
-                    text-decoration: underline;
-                }
-                .nav-links a.active {
-                    border-bottom: 2px solid white;
-                    padding-bottom: 2px;
-                }
+                .nav-links a:hover, .nav-links a.active { color: white; }
+                .nav-links a.active { border-bottom: 2px solid white; }
             </style>
             <nav>
                 <div class="nav-links">
-                    ${links.map(link => {
+                    ${filteredLinks.map(link => {
                         const isActive = currentPath.endsWith(link.href) ? 'class="active"' : '';
                         return `<a href="${link.href}" ${isActive}>${link.name}</a>`;
                     }).join('')}
                 </div>
             </nav>
         `;
-        console.log("%c Shadow DOM: <nav-bar> encapsulated", "color: #20c997; font-weight: bold;");
     }
 }
 
