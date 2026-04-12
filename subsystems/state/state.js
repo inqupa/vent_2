@@ -1,11 +1,22 @@
-// Phase 2.2 Refined: Global State with Persistence
+// Phase 1.1 Refactor: Implement State Namespacing
 const initialState = {
-    name: "User Name",
-    bio: "Short bio goes here.",
-    theme: localStorage.getItem('theme') || "light",
-    // Persisted visit count and dismissal status
-    visitCount: parseInt(localStorage.getItem('visitCount')) || 0,
-    dismissedSuggestion: localStorage.getItem('dismissedSuggestion') === 'true'
+    // userState namespace
+    user: {
+        name: "User Name",
+        bio: "Short bio goes here.",
+        email: "user@example.com"
+    },
+    // uiState namespace
+    ui: {
+        theme: localStorage.getItem('theme') || "light",
+        dismissedSuggestion: localStorage.getItem('dismissedSuggestion') === 'true'
+    },
+    // dataState namespace
+    data: {
+        visitCount: parseInt(localStorage.getItem('visitCount')) || 0
+    },
+    // Phase 1.1: Create a Subscriber Registry
+    subscribers: [] 
 };
 
 function updateUI(property, value) {
