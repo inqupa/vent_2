@@ -1,17 +1,34 @@
-/* Phase 2.2: Theme Variables */
+/* Phase 4.1: CSS Variables & Calm Theming */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
+    /* Cloud Dancer Palette (Light Mode) */
+    --bg-color: #f0ebe3;        /* Muted off-white */
+    --card-bg: #ffffff;
+    --text-primary: #3c3c3c;
+    --accent-color: #7d8471;    /* Sage green */
+    --focus-ring: #005fcc;
+    --spacing-unit: 8px;
 }
 
 [data-theme="dark"] {
-    --bg-color: #1a1a1a;
-    --text-color: #f4f4f4;  /* Light text for dark background */
+    /* Nature Distilled (Dark Mode) */
+    --bg-color: #1a1c18;
+    --card-bg: #23261f;
+    --text-primary: #e2e3da;
+    --accent-color: #b7ccb0;
 }
 
 body {
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Global 2026 Compliance: High-Contrast Focus States */
+:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 4px;
 }
 
 /* Removes default browser margins */
@@ -65,8 +82,4 @@ button {
     padding: 10px 20px;
     font-size: 1rem;
     cursor: pointer;
-}
-
-a {
-    color: red !important;
 }

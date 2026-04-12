@@ -19,6 +19,7 @@ function updateUI(property, value) {
     
     if (property === "visitCount") {
         localStorage.setItem('visitCount', value);
+        return;
     }
 
     if (property === "dismissedSuggestion") {
