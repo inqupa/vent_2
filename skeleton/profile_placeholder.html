@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="../skin/profile_style_placeholder.css">
         <script src="../subsystems/state/state.js"></script>
     </head>
+
     <body>
         <nav-bar></nav-bar>
         <div class="profile-container">
@@ -27,6 +28,31 @@
                 <button type="button">Edit Profile</button>
             </div>
         </div>
+
+        <template id="nav-bar-template">
+            <style>
+                nav { background: #333; padding: 10px; display: flex; justify-content: center; }
+                .nav-links a { color: rgba(255, 255, 255, 0.6); text-decoration: none; margin: 0 15px; font-family: sans-serif; font-weight: bold; }
+                .nav-links a:hover, .nav-links a.active { color: white; }
+            </style>
+            <nav>
+                <div class="nav-links"></div>
+            </nav>
+        </template>
+
+        <template id="user-card-template">
+            <style>
+                .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+                .profile-picture { width: 150px; height: 150px; background-color: #ddd; border-radius: 50%; margin-bottom: 20px; }
+                .username { margin: 10px 0; color: var(--text-color, #333); }
+            </style>
+            <div class="header">
+                <div class="profile-picture"></div>
+                <h1 class="username"></h1>
+                <p class="bio"></p>
+            </div>
+        </template>
+
         <script src="../subsystems/router.js"></script>
     </body>
 </html>
