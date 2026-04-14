@@ -8,8 +8,8 @@
     --focus-ring: #005fcc;
     --spacing-unit: 8px;
     --success-color: #a3b18a;
-    --nav-bg: #333333; /* Centralized from nav-bar logic */
-    --nav-link-color: rgba(255, 255, 255, 0.6);
+    --nav-bg: #121212; /* Centralized from nav-bar logic */
+    --nav-link-color: rgba(255, 255, 255, 0.9);
 }
 
 [data-theme="dark"] {
@@ -18,5 +18,5 @@
     --card-bg: #23261f;
     --text-primary: #e2e3da;
     --accent-color: #d1e2cc;
-    --nav-bg: #121212;
+    --nav-bg: #333333;
 }

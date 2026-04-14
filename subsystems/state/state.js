@@ -59,7 +59,7 @@ function createPersistentState(state) {
                 window.appState.subscribers.forEach(sub => {
                     // This checks if the changed property matches the subscriber's key
                     // OR if the subscriber is watching the parent namespace
-                    if (sub.key === property || sub.key === '*' || sub.key === 'user') {
+                    if (sub.key === property || sub.key === '*' || sub.key === 'user' || property === 'theme') {
                         try {
                             sub.callback(property, value);
                         } catch (err) {
@@ -83,19 +83,8 @@ function applyTimeTheme() {
     if (!localStorage.getItem('theme')) {
         const hour = new Date().getHours();
         const suggestedTheme = (hour < 6 || hour > 18) ? "dark" : "light";
-        window.appState.theme = suggestedTheme;
+        window.appState.ui.theme = suggestedTheme;
     }
-}
-
-// Global Execution on Load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        updateUI("theme", window.appState.theme); 
-        applyTimeTheme();
-    });
-} else {
-    updateUI("theme", window.appState.theme);
-    applyTimeTheme();
 }
 
 // Phase 1.3: Enhanced Selective Subscription Helper
@@ -106,3 +95,8 @@ window.subscribeToState = (key, callback) => {
         console.log(`Phase 1.3: Registered selective subscriber for [${key}]`);
     }
 };
+
+// This ensures that whenever appState.ui.theme changes, the DOM is updated
+window.subscribeToState('theme', (prop, val) => {
+    updateUI(prop, val);
+});
