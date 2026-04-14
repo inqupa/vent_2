@@ -6,9 +6,10 @@ const ASSETS_TO_CACHE = [
     '/skin/auth_style_placeholder.css',
     '/skin/problem_style_placeholder.css',
     '/skin/profile_style_placeholder.css',
+    '/subsystems/logic/nav-bar.js',
+    '/subsystems/logic/user-card.js',
     '/subsystems/state/state.js',
     '/subsystems/db.js',
-    '/subsystems/router.js',
     '/skeleton/auth_placeholder.html',
     '/skeleton/problem_placeholder.html',
     '/skeleton/profile_placeholder.html'
