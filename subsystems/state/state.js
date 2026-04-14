@@ -96,6 +96,8 @@ window.subscribeToState = (key, callback) => {
     }
 };
 
+// NEW: Force the initial UI update based on the stored theme
+updateUI('theme', window.appState.ui.theme);
 // This ensures that whenever appState.ui.theme changes, the DOM is updated
 window.subscribeToState('theme', (prop, val) => {
     updateUI(prop, val);

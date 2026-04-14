@@ -26,6 +26,12 @@ class NavBar extends HTMLElement {
             const a = document.createElement('a');
             a.href = link.href;
             a.textContent = link.name;
+            // FIX: Add 'active' class if the current path matches the link
+            // We use .includes() or .endsWith() to handle path variations
+            if (window.location.pathname.endsWith(link.href) || 
+            (window.location.pathname === '/' && link.href === '/index.html')) {
+                a.classList.add('active');
+            }
             navLinks.appendChild(a);
         });
 
