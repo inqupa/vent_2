@@ -50,17 +50,17 @@
                 if (!window.appState) return;
 
                 // TRIGGER 2: Increment count simply for visiting this page
-                window.appState.visitCount++;
+                window.appState.data.visitCount++;
 
                 // Show box if count > 3 AND user hasn't dismissed it
-                if (window.appState.visitCount > 3 && !window.appState.dismissedSuggestion) {
+                if (window.appState.data.visitCount > 3 && !window.appState.ui.dismissedSuggestion) {
                     const box = document.getElementById('suggestion-box');
                     if (box) box.style.display = 'block';
                 }
 
                 // Handle the "Not Now" choice
                 document.getElementById('dismiss-suggestion').addEventListener('click', () => {
-                    window.appState.dismissedSuggestion = true;
+                    window.appState.ui.dismissedSuggestion = true;
                     document.getElementById('suggestion-box').style.display = 'none';
                 });
             });

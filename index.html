@@ -93,12 +93,14 @@
                 <p class="bio"></p>
             </div>
         </template>
+        
         <script>
             // Finds the button and tells it to go to the auth page when clicked
             document.querySelector('button').addEventListener('click', function() {
                 window.location.href = '/skeleton/problem_placeholder.html';
             });
         </script>
+        
         <script>
             // Phase 2.1: Predictive Hover Logic
             const submitBtn = document.querySelector('.input-section button');
@@ -106,14 +108,13 @@
             if (submitBtn) {
                 submitBtn.addEventListener('mouseenter', () => {
                     console.log("%c Predictive Signal: Preparing assets...", "color: #6f42c1;");
-                    
-                    // FIXED: Removed '.user' to match your actual state structure
                     if (window.appState) {
-                        window.appState.visitCount++;
+                        window.appState.data.visitCount++;
                     }
                 });
             }
         </script>
+        
         <script>
             const tx = document.getElementById('vent-input');
             
@@ -131,6 +132,7 @@
                 tx.focus();
             });
         </script>
+        
         <script>
             // Force focus on page load to ensure "Always Ready" state
             window.addEventListener('load', () => {
@@ -139,16 +141,38 @@
             });
         </script>
 
-         <!-- Phase 3.3: Service Worker Registration Script -->
         <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js')
-                        .then(reg => console.log('Phase 3.3: Service Worker Registered', reg))
-                        .catch(err => console.log('Phase 3.3: Registration Failed', err));
-                });
-            }
+            const startApp = async () => {
+                // Fix for Issue #1: Centralized Service Worker Registration
+                if ('serviceWorker' in navigator) {
+                    try {
+                        await navigator.serviceWorker.register('/sw.js');
+                        console.log('Phase 3.3: Service Worker Active');
+                    } catch (err) {
+                        console.error('SW Registration Failed:', err);
+                    }
+                }
+
+                // Fix for Issue #2: Global Database Error Handling
+                if (window.initDB) {
+                    try {
+                        await window.initDB();
+                        console.log("Phase 3.1: Database Connected");
+                    } catch (dbErr) {
+                        // If the database fails, we show a visual warning to the user
+                        console.error("Database initialization failed:", dbErr);
+                        const errorBanner = document.createElement('div');
+                        errorBanner.style = "position:fixed; top:0; width:100%; background:red; color:white; text-align:center; padding:10px; z-index:9999; font-family:sans-serif;";
+                        errorBanner.textContent = "Critical Error: Offline storage is unavailable.";
+                        document.body.prepend(errorBanner);
+                    }
+                }
+            };
+
+            // This ensures everything starts only after the page is fully loaded
+            window.addEventListener('load', startApp);
         </script>
+        
         <script src="subsystems/router.js"></script>
     </body>
 </html>
