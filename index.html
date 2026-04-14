@@ -138,6 +138,17 @@
                 if (input) input.focus();
             });
         </script>
+
+         <!-- Phase 3.3: Service Worker Registration Script -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('Phase 3.3: Service Worker Registered', reg))
+                        .catch(err => console.log('Phase 3.3: Registration Failed', err));
+                });
+            }
+        </script>
         <script src="subsystems/router.js"></script>
     </body>
 </html>
