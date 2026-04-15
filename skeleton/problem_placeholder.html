@@ -35,37 +35,53 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                if (!window.appState) return;
-
-                // Function to evaluate if the suggestion box should be shown
-                const checkSuggestionStatus = () => {
-                    const count = window.appState.data.visitCount;
-                    const dismissed = window.appState.ui.dismissedSuggestion;
+                
+                // Create an initialization loop to wait for the bootloader
+                const initializeProblemPage = () => {
                     
-                    console.log(`Checking Suggestion: Count is ${count}, Dismissed is ${dismissed}`);
-                    
-                    if (count > 3 && !dismissed) {
-                        const box = document.getElementById('suggestion-box');
-                        if (box) box.style.display = 'block';
+                    // 1. If state isn't injected yet, wait 50ms and try again
+                    if (!window.appState || !window.appState.data) {
+                        setTimeout(initializeProblemPage, 50);
+                        return;
                     }
+
+                    // 2. Sanitize data (Resets NaN back to 0 if your old save got corrupted)
+                    if (typeof window.appState.data.visitCount !== 'number' || isNaN(window.appState.data.visitCount)) {
+                        window.appState.data.visitCount = 0;
+                    }
+
+                    // Function to evaluate if the suggestion box should be shown
+                    const checkSuggestionStatus = () => {
+                        const count = window.appState.data.visitCount;
+                        const dismissed = window.appState.ui.dismissedSuggestion;
+                        
+                        console.log(`Checking Suggestion: Count is ${count}, Dismissed is ${dismissed}`);
+                        
+                        if (count > 3 && !dismissed) {
+                            const box = document.getElementById('suggestion-box');
+                            if (box) box.style.display = 'block';
+                        }
+                    };
+
+                    // 3. Subscribe to changes
+                    window.subscribeToState('data', checkSuggestionStatus);
+                    window.subscribeToState('ui', checkSuggestionStatus);
+
+                    // 4. Increment the visit count for the current visit
+                    window.appState.data.visitCount++;
+
+                    // 5. Initial check
+                    checkSuggestionStatus();
+
+                    // Handle the "Not Now" choice
+                    document.getElementById('dismiss-suggestion').addEventListener('click', () => {
+                        window.appState.ui.dismissedSuggestion = true;
+                        document.getElementById('suggestion-box').style.display = 'none';
+                    });
                 };
 
-                // 1. Subscribe to changes in 'data' and 'ui' so the box appears/disappears reactively
-                window.subscribeToState('data', checkSuggestionStatus);
-                window.subscribeToState('ui', checkSuggestionStatus);
-
-                // 2. Increment the visit count for the current visit
-                // Because of the fix in state.js, this will no longer result in NaN
-                window.appState.data.visitCount++;
-
-                // 3. Initial check for the current page load
-                checkSuggestionStatus();
-
-                // Handle the "Not Now" choice
-                document.getElementById('dismiss-suggestion').addEventListener('click', () => {
-                    window.appState.ui.dismissedSuggestion = true;
-                    document.getElementById('suggestion-box').style.display = 'none';
-                });
+                // Start the initialization loop
+                initializeProblemPage();
             });
         </script>
     </body>

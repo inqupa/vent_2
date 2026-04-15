@@ -1,12 +1,12 @@
 // 1. Try to load existing state from the hard drive first
 const savedState = localStorage.getItem('vent_app_state');
-const parsedState = savedState ? JSON.parse(savedState) : null;
+const parsedState = savedState ? JSON.parse(savedState) : {};
 
 // 2. Define initialState, merging saved data if it exists
-let initialState = parsedState || {
-    user: { name: "", bio: "", email: "" },
-    ui: { theme: "light", dismissedSuggestion: false },
-    data: { visitCount: 0 },
+let initialState = {
+    user: { name: "", bio: "", email: "", ...(parsedState.user || {}) },
+    ui: { theme: "light", dismissedSuggestion: false, ...(parsedState.ui || {}) },
+    data: { visitCount: 0, ...(parsedState.data || {}) },
     subscribers: [] 
 };
 
