@@ -23,10 +23,11 @@ function injectScript(src) {
     if (!document.querySelector(`script[src*="${src}"]`)) {
         const script = document.createElement('script');
         script.src = '../' + src;
-        // Logic check: Core systems like state.js should load without defer
-        // to ensure they are ready before components like nav-bar.js
+
+        // ensure state.js is prioritized and blocking
         if (src.includes('state.js')) {
             script.async = false; // Ensures synchronous execution in order
+            script.defer = false; // add this to force immediate execution
         } else {
             script.defer = true;
         }

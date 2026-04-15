@@ -2,6 +2,8 @@ const CACHE_NAME = 'vent-cache-v1';
 const ASSETS_TO_CACHE = [
     '/',
     '/config/manifest.json',
+    '/config/version.json',
+    '/data/default_state.json',
     '/index.html',
     '/skin/theme.css',
     '/skin/base.css',
@@ -15,7 +17,8 @@ const ASSETS_TO_CACHE = [
     '/subsystems/db.js',
     '/skeleton/auth_placeholder.html',
     '/skeleton/problem_placeholder.html',
-    '/skeleton/profile_placeholder.html'
+    '/skeleton/profile_placeholder.html',
+    '/tools/validator.js'
 ];
 const VERSION_CHECK_URL = '/config/version.json';
 
