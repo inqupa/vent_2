@@ -1,3 +1,22 @@
+// 1. Try to load existing state from the hard drive first
+const savedState = localStorage.getItem('vent_app_state');
+const parsedState = savedState ? JSON.parse(savedState) : null;
+
+// 2. Define initialState, merging saved data if it exists
+let initialState = parsedState || {
+    user: { name: "", bio: "", email: "" },
+    ui: { theme: "light", dismissedSuggestion: false },
+    data: { visitCount: 0 },
+    subscribers: [] 
+};
+
+// FIX: Always re-attach the empty subscribers array on every page load
+// because it cannot be (and was not) saved to localStorage.
+initialState.subscribers = [];
+
+// 3. Create the Proxy immediately
+window.appState = createPersistentState(initialState);
+
 async function loadInitialState() {
     const saved = localStorage.getItem('app_state_exists');
     if (!saved) {
@@ -14,17 +33,6 @@ async function loadInitialState() {
         }
     }
 }
-
-// 1. Define initialState with the subscribers array immediately
-let initialState = {
-    user: { name: "", bio: "", email: "" },
-    ui: { theme: "light", dismissedSuggestion: false },
-    data: { visitCount: 0 }, // visitCount now starts at 0, not undefined
-    subscribers: [] 
-};
-
-// 2. Create the Proxy immediately so window.appState is never undefined
-window.appState = createPersistentState(initialState);
 
 function updateUI(prop, val) {
     if (prop === 'theme') {
@@ -72,6 +80,15 @@ function createPersistentState(state) {
                     }
                 });
             }
+
+            // NEW: Save the entire state object to localStorage automatically on every change
+            // We exclude subscribers since functions cannot be saved to JSON
+            const stateToSave = {
+                user: window.appState.user,
+                ui: window.appState.ui,
+                data: window.appState.data
+            };
+            localStorage.setItem('vent_app_state', JSON.stringify(stateToSave));
 
             window.dispatchEvent(new Event('stateChange'));
             return true;

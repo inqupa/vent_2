@@ -89,13 +89,18 @@
         </template>
         
         <script>
-            // index.html - Near the bottom
-            document.querySelector('#submit-vent').addEventListener('click', function() {
-                // PERSISTENCE FIX: Increment count on actual click
+            document.querySelector('#submit-vent').addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default button behavior just in case
+                
                 if (window.appState) {
                     window.appState.data.visitCount++;
                 }
-                window.location.href = '/skeleton/problem_placeholder.html';
+                
+                // Add a tiny delay to ensure the Proxy has time to write to localStorage 
+                // before the page context is destroyed by the redirect.
+                setTimeout(() => {
+                    window.location.href = '/skeleton/problem_placeholder.html';
+                }, 50); 
             });
         </script>
         
