@@ -1,3 +1,4 @@
+let saveTimeout = null;
 // 1. Try to load existing state from the hard drive first
 const savedState = localStorage.getItem('vent_app_state');
 const parsedState = savedState ? JSON.parse(savedState) : {};
@@ -53,6 +54,33 @@ function updateUI(prop, val) {
     });
 }
 
+// --- NEW DEBOUNCE LOGIC ---
+function debouncedSaveState() {
+    // Clear the previous timeout if it exists
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+    }
+    
+    // Set a new timeout to save after 2 seconds (2000 ms) of inactivity
+    saveTimeout = setTimeout(() => {
+        if (!window.appState) return;
+        
+        const stateToSave = {
+            user: window.appState.user,
+            ui: window.appState.ui,
+            data: window.appState.data
+        };
+        
+        try {
+            localStorage.setItem('vent_app_state', JSON.stringify(stateToSave));
+            console.log("Phase 1 Security: State securely saved to localStorage (debounced)");
+        } catch (e) {
+            console.error("Failed to save state. Storage quota may be exceeded.", e);
+        }
+    }, 2000); 
+}
+// --------------------------
+
 function createPersistentState(state) {
     const handler = {
         get(target, property) {
@@ -81,14 +109,8 @@ function createPersistentState(state) {
                 });
             }
 
-            // NEW: Save the entire state object to localStorage automatically on every change
-            // We exclude subscribers since functions cannot be saved to JSON
-            const stateToSave = {
-                user: window.appState.user,
-                ui: window.appState.ui,
-                data: window.appState.data
-            };
-            localStorage.setItem('vent_app_state', JSON.stringify(stateToSave));
+            // --- NEW: CALL DEBOUNCED SAVE INSTEAD ---
+            debouncedSaveState();
 
             window.dispatchEvent(new Event('stateChange'));
             return true;
