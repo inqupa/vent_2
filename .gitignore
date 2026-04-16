@@ -1,8 +1,7 @@
 # miscellaneous folders
 /.vscode
 /tools
-/data
-/config
+
 
 # wrangler files
 .wrangler
