@@ -1,14 +1,23 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "vent",
-  "compatibility_date": "2026-04-16",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "."
-  },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+	"main": "vent_red/vent_red.js",
+	"account_id": "584f1d66a20f6e2bc943f16ba0831c40",
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "vent_red",
+	"compatibility_date": "2026-04-16",
+	"observability": {
+		"enabled": true
+	},
+	"assets": {
+		"directory": "."
+	},
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "vent_black",
+			"database_name": "vent_black",
+			"database_id": "81ecb72e-6efb-4a0a-b720-c482e4337369"
+		}
+	]
 }
