@@ -69,7 +69,13 @@ self.addEventListener('activate', (event) => {
 
 // Intercept requests - Serve from cache first, then network
 self.addEventListener('fetch', (event) => {
-    // Specifically allow navigations to handle redirects naturally
+    // 1. ALWAYS bypass cache for API calls
+    if (event.request.url.includes('/api/')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    // 2. Allow navigations to handle redirects naturally
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request).catch(() => caches.match(event.request))
@@ -77,6 +83,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // 3. Cache-first for everything else (UI assets)
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request);
