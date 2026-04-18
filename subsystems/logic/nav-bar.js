@@ -32,8 +32,11 @@ class NavBar extends HTMLElement {
             a.href = link.href;
             a.textContent = link.name;
             
-            if (window.location.pathname.endsWith(link.href) || 
-               (window.location.pathname === '/' && link.href === '/index.html')) {
+            // Highlight the active page
+            const currentPath = window.location.pathname.replace('.html', '');
+            const linkPath = link.href.replace('.html', '');
+
+            if (currentPath.endsWith(linkPath) || (currentPath === '/' && linkPath === '/index')) {
                 a.classList.add('active');
             }
             navLinks.appendChild(a);

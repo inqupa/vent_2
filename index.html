@@ -88,7 +88,6 @@
                 if (content && window.saveVent) {
                     const ventData = {
                         content: content,
-                        // Automatically generates the month and year string
                         vent_month_year: new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })
                     };
                     
@@ -100,8 +99,11 @@
                             window.appState.data.visitCount++;
                         }
                         
-                        // Redirect only after the database confirms receipt
-                        window.location.href = '/skeleton/problem_placeholder.html';
+                        // FIX: Wait 500ms before redirecting to allow the debounced state to save
+                        setTimeout(() => {
+                            window.location.href = '/skeleton/problem_placeholder.html';
+                        }, 500);
+                        
                     } catch (err) {
                         console.error("Failed to send vent to backend:", err);
                         alert("Connection failed. Your vent could not be saved.");

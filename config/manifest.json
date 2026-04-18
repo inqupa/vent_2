@@ -8,9 +8,10 @@
   },
   "mapping": {
     "profile_placeholder.html": {
-        "logic": [
-            "subsystems/logic/user-card.js"
-        ]
+        "logic": ["subsystems/logic/user-card.js"]
+    },
+    "profile_placeholder": {
+        "logic": ["subsystems/logic/user-card.js"]
     }
   }
 }
