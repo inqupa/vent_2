@@ -69,6 +69,14 @@ self.addEventListener('activate', (event) => {
 
 // Intercept requests - Serve from cache first, then network
 self.addEventListener('fetch', (event) => {
+    // Specifically allow navigations to handle redirects naturally
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match(event.request))
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request);

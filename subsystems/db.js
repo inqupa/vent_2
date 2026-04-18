@@ -25,18 +25,17 @@ window.initDB = () => {
 
 // Save a new vent (problem) to the database
 window.saveVent = async (ventData) => {
-    const db = await window.initDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['vents'], 'readwrite');
-        const store = transaction.objectStore('vents');
-        const request = store.add(ventData);
-
-        request.onsuccess = () => {
-            console.log("Phase 3.2: Vent saved to IndexedDB");
-            resolve(request.result);
-        };
-        request.onerror = () => reject(request.error);
+    const response = await fetch('/api/vent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ventData)
     });
+    
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const result = await response.json();
+    console.log("Phase 3.3: Vent saved to remote D1 database", result);
+    return result;
 };
 
 // Retrieve all vents from the database

@@ -22,7 +22,7 @@ async function bootloader() {
 function injectScript(src) {
     if (!document.querySelector(`script[src*="${src}"]`)) {
         const script = document.createElement('script');
-        script.src = '../' + src;
+        script.src = '/' + src;
 
         // ensure state.js is prioritized and blocking
         if (src.includes('state.js')) {

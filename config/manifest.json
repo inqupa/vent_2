@@ -2,22 +2,14 @@
   "system": {
     "core_logic": [
         "subsystems/state/state.js",
-        "subsystems/db.js"
+        "subsystems/db.js",
+        "subsystems/logic/nav-bar.js"
     ]
   },
   "mapping": {
-    "auth_placeholder.html": {
-        "logic": ["subsystems/logic/nav-bar.js"]
-    },
     "profile_placeholder.html": {
         "logic": [
-            "subsystems/logic/nav-bar.js",
             "subsystems/logic/user-card.js"
-        ]
-    },
-    "problem_placeholder.html": {
-        "logic": [
-            "subsystems/logic/nav-bar.js"
         ]
     }
   }

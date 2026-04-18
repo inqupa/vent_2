@@ -90,18 +90,34 @@
         </template>
         
         <script>
-            document.querySelector('#submit-vent').addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default button behavior just in case
+            document.querySelector('#submit-vent').addEventListener('click', async function(e) {
+                e.preventDefault();
                 
-                if (window.appState) {
-                    window.appState.data.visitCount++;
+                const input = document.getElementById('vent-input');
+                const content = input.value.trim();
+                
+                if (content && window.saveVent) {
+                    const ventData = {
+                        content: content,
+                        // Automatically generates the month and year string
+                        vent_month_year: new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })
+                    };
+                    
+                    try {
+                        // Sends data to the backend API
+                        await window.saveVent(ventData);
+                        
+                        if (window.appState) {
+                            window.appState.data.visitCount++;
+                        }
+                        
+                        // Redirect only after the database confirms receipt
+                        window.location.href = '/skeleton/problem_placeholder.html';
+                    } catch (err) {
+                        console.error("Failed to send vent to backend:", err);
+                        alert("Connection failed. Your vent could not be saved.");
+                    }
                 }
-                
-                // Add a tiny delay to ensure the Proxy has time to write to localStorage 
-                // before the page context is destroyed by the redirect.
-                setTimeout(() => {
-                    window.location.href = '/skeleton/problem_placeholder.html';
-                }, 50); 
             });
         </script>
         
