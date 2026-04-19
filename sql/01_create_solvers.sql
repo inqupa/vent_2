@@ -1,0 +1,6 @@
+CREATE TABLE solvers (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    role TEXT DEFAULT 'solver',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

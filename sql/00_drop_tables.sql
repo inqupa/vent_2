@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS vents;
+DROP TABLE IF EXISTS solvers;
+DROP TABLE IF EXISTS magic_links;
+DROP TABLE IF EXISTS anonymous_visitors;
