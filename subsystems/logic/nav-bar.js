@@ -6,6 +6,30 @@ class NavBar extends HTMLElement {
     }
 
     connectedCallback() {
+        // Safeguard: Visual Alarm for God Mode
+        if (document.cookie.includes('vent_godmode=true')) {
+            const warningBanner = document.createElement('div');
+            warningBanner.style.cssText = `
+                background-color: #ff0000;
+                color: #ffffff;
+                text-align: center;
+                padding: 5px;
+                font-family: sans-serif;
+                font-weight: bold;
+                font-size: 0.85rem;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 10000;
+                pointer-events: none;
+            `;
+            warningBanner.innerText = "⚠️ SYSTEM SAFEGUARD: GOD MODE ACTIVE. SUBMISSIONS QUARANTINED AS TEST DATA.";
+            
+            // Push the body down so the banner doesn't cover your UI
+            document.body.style.marginTop = "30px";
+            document.body.appendChild(warningBanner);
+        }
         this.render();
     }
 

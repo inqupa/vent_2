@@ -12,6 +12,19 @@ export default {
 
     const url = new URL(request.url);
 
+    // Developer God Mode Toggle
+    if (request.method === "GET" && url.pathname === "/api/dev/godmode") {
+        const enable = url.searchParams.get('enable') === 'true';
+        let responseHeaders = new Headers(corsHeaders);
+        if (enable) {
+            responseHeaders.set("Set-Cookie", "vent_godmode=true; HttpOnly; Path=/; Max-Age=31536000; SameSite=Lax");
+            return new Response("God mode enabled.", { status: 200, headers: responseHeaders });
+        } else {
+            responseHeaders.set("Set-Cookie", "vent_godmode=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+            return new Response("God mode disabled.", { status: 200, headers: responseHeaders });
+        }
+    }
+
     // Handle New Vent Submission (Unlimited, Anonymous, Trackable)
     if (request.method === "POST" && url.pathname === "/api/vent") {
         try {
@@ -19,17 +32,21 @@ export default {
             const ventTrackingId = crypto.randomUUID(); // Unique tracker for the Ventor
             
             let solverId = null;
+            let isTest = 0;
 
-            // If user is a registered Solver, link their ID. Otherwise, it stays NULL (Anonymous)
-            const cookieHeader = request.headers.get('Cookie');
-            if (cookieHeader && cookieHeader.includes('vent_session=')) {
-                solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
+            if (cookieHeader) {
+                if (cookieHeader.includes('vent_session=')) {
+                    solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
+                }
+                if (cookieHeader.includes('vent_godmode=true')) {
+                    isTest = 1; // Quarantine this data
+                }
             }
-            
-            // Save the vent. NO limits applied here.
+                
+            // Save the vent with the test flag
             await env.vent_black.prepare(
-                "INSERT INTO vents (id, content, vent_month_year, solver_id) VALUES (?, ?, ?, ?)"
-            ).bind(ventTrackingId, payload.content, payload.vent_month_year, solverId).run();
+                "INSERT INTO vents (id, content, vent_month_year, solver_id, is_test) VALUES (?, ?, ?, ?, ?)"
+            ).bind(ventTrackingId, payload.content, payload.vent_month_year, solverId, isTest).run();
 
             return new Response(JSON.stringify({ 
                 success: true, 
@@ -43,11 +60,15 @@ export default {
         }
     }
 
-    // 2. Enforce Problem Page Limit (Max 10 views for anonymous users)
+    // Enforce Problem Page Limit (Max 10 views for anonymous users)
     if (request.method === "GET" && url.pathname === "/api/problems/access") {
         const cookieHeader = request.headers.get('Cookie') || "";
         const isPeek = url.searchParams.get('peek') === 'true';
         
+        if (cookieHeader.includes('vent_godmode=true')) {
+            return new Response(JSON.stringify({ access: "granted", viewsLeft: "Infinite" }), { status: 200, headers: corsHeaders });
+        }
+
         if (cookieHeader.includes('vent_session=')) {
             return new Response(JSON.stringify({ access: "granted" }), { status: 200, headers: corsHeaders });
         }

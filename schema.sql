@@ -1,24 +1,27 @@
--- Create the Solvers table (Known users)
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+DROP TABLE IF EXISTS vents;
+DROP TABLE IF EXISTS solvers;
+DROP TABLE IF EXISTS magic_links;
+DROP TABLE IF EXISTS anonymous_visitors;
+
+CREATE TABLE solvers (
+    id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
-    role TEXT DEFAULT 'venter',
+    role TEXT DEFAULT 'solver',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the Vents table (Completely anonymous)
-CREATE TABLE IF NOT EXISTS vents (
+CREATE TABLE magic_links (
+    token TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL
+);
+
+CREATE TABLE vents (
     id TEXT PRIMARY KEY,
     content TEXT NOT NULL,
     vent_month_year TEXT NOT NULL,
-    solver_id TEXT
-);
-
-CREATE TABLE IF NOT EXISTS magic_links (
-    token TEXT PRIMARY KEY,
-    email TEXT NOT NULL,
-    expires_at DATETIME NOT NULL,
+    solver_id TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
