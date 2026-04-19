@@ -17,41 +17,46 @@ export default {
         const enable = url.searchParams.get('enable') === 'true';
         let responseHeaders = new Headers(corsHeaders);
         if (enable) {
-            responseHeaders.set("Set-Cookie", "vent_godmode=true; HttpOnly; Path=/; Max-Age=31536000; SameSite=Lax");
+            // Removed HttpOnly so frontend JS can see the warning banner
+            responseHeaders.set("Set-Cookie", "vent_godmode=true; Path=/; Max-Age=31536000; SameSite=Lax");
             return new Response("God mode enabled.", { status: 200, headers: responseHeaders });
         } else {
-            responseHeaders.set("Set-Cookie", "vent_godmode=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+            responseHeaders.set("Set-Cookie", "vent_godmode=; Path=/; Max-Age=0; SameSite=Lax");
             return new Response("God mode disabled.", { status: 200, headers: responseHeaders });
         }
     }
 
-    // Handle New Vent Submission (Unlimited, Anonymous, Trackable)
+    // 1. Handle New Vent Submission (Unlimited, Anonymous, Trackable, with God Mode Check)
     if (request.method === "POST" && url.pathname === "/api/vent") {
         try {
             const payload = await request.json();
-            const ventTrackingId = crypto.randomUUID(); // Unique tracker for the Ventor
+            const ventTrackingId = crypto.randomUUID(); 
             
             let solverId = null;
             let isTest = 0;
 
+            const cookieHeader = request.headers.get('Cookie');
+
             if (cookieHeader) {
+                // Check if normal registered user
                 if (cookieHeader.includes('vent_session=')) {
                     solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
                 }
+                // Check if Admin in God Mode
                 if (cookieHeader.includes('vent_godmode=true')) {
                     isTest = 1; // Quarantine this data
                 }
             }
-                
-            // Save the vent with the test flag
+            
+            // Save the vent
             await env.vent_black.prepare(
                 "INSERT INTO vents (id, content, vent_month_year, solver_id, is_test) VALUES (?, ?, ?, ?, ?)"
             ).bind(ventTrackingId, payload.content, payload.vent_month_year, solverId, isTest).run();
 
             return new Response(JSON.stringify({ 
                 success: true, 
-                trackingId: ventTrackingId, // Send tracker back to Ventor
-                message: "Vent submitted securely and anonymously."
+                trackingId: ventTrackingId,
+                message: "Vent submitted securely."
             }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" }
             });
