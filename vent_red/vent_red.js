@@ -1,8 +1,18 @@
 export default {
   async fetch(request, env) {
+    const allowedOrigins =[
+        'http://localhost:8787',
+        'https://vent.inqupa.workers.dev'
+    ];
+    
+    const origin = request.headers.get('Origin');
+    
+    // If origin matches, allow it. Otherwise, fallback to the first allowed origin (blocks unauthorized sites)
+    const isAllowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
     const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Origin": isAllowedOrigin,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
 
@@ -26,10 +36,19 @@ export default {
         }
     }
 
-    // 1. Handle New Vent Submission (Unlimited, Anonymous, Trackable, with God Mode Check)
+    // Handle New Vent Submission (Unlimited, Anonymous, Trackable, with God Mode Check)
     if (request.method === "POST" && url.pathname === "/api/vent") {
         try {
             const payload = await request.json();
+
+            // Server-Side Input Validation
+            if (!payload.content || typeof payload.content !== 'string' || payload.content.trim().length === 0) {
+                return new Response(JSON.stringify({ error: "Vent content cannot be empty." }), { status: 400, headers: corsHeaders });
+            }
+            if (payload.content.length > 10000) {
+                return new Response(JSON.stringify({ error: "Vent is too long (max 10000 characters)." }), { status: 400, headers: corsHeaders });
+            }
+
             const ventTrackingId = crypto.randomUUID(); 
             
             let solverId = null;
@@ -141,8 +160,25 @@ export default {
         const data = await request.json();
         const { email } = data;
 
-        if (!email) {
-            return new Response(JSON.stringify({ error: 'Email required' }), { status: 400 });
+        // Basic Server-Side Email Validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email) || email.length > 100) {
+            return new Response(JSON.stringify({ error: 'Valid email required' }), { status: 400, headers: corsHeaders });
+        }
+
+        // Rate Limiting: Check if a link was already sent recently (60-second cooldown)
+        const recentLink = await env.vent_black.prepare(
+            "SELECT created_at FROM magic_links WHERE email = ? ORDER BY created_at DESC LIMIT 1"
+        ).bind(email).first();
+
+        if (recentLink) {
+            // BUG FIX: Add 'Z' to force JavaScript to parse the SQLite string as UTC time
+            const dbTimeUTC = new Date(recentLink.created_at + 'Z').getTime();
+            const timeSinceLastLink = Date.now() - dbTimeUTC;
+
+            if (timeSinceLastLink < 60000) { 
+                return new Response(JSON.stringify({ error: 'Please wait 60 seconds before requesting another link.' }), { status: 429, headers: corsHeaders });
+            }
         }
 
         // 1. Ensure user exists (Register if new)

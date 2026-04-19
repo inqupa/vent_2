@@ -56,13 +56,44 @@
                 }
             });
 
-            // Reset UI specifically after a form "submission" (simulated)
-            document.querySelector('form').addEventListener('submit', (e) => {
-                // In a real app, this is where your API call happens
-                setTimeout(() => {
-                    authBtn.textContent = "Get Magic Link";
-                    emailInput.value = "";
-                }, 500);
+            document.querySelector('form').addEventListener('submit', async (e) => {
+                e.preventDefault(); // CRITICAL: Stops the browser from refreshing the page
+
+                const email = emailInput.value.trim();
+                if (!email) return;
+
+                const originalText = authBtn.textContent;
+                authBtn.textContent = "Sending...";
+                authBtn.disabled = true; // Prevent double-clicks
+
+                try {
+                    const response = await fetch('/api/auth/magic-link', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+
+                    const data = await response.json();
+
+                    // Check if the backend rejected it (e.g., Rate Limit or Validation Error)
+                    if (!response.ok) {
+                        alert(data.error || "Failed to send link.");
+                        authBtn.textContent = originalText;
+                        authBtn.disabled = false;
+                        return;
+                    }
+
+                    // Success state
+                    authBtn.textContent = "Check your email!";
+                    authBtn.style.backgroundColor = "#2a9d8f"; // Visual success cue
+                    authBtn.style.color = "white";
+                    
+                } catch (error) {
+                    console.error("Connection failed:", error);
+                    alert("Network error. Could not reach the server.");
+                    authBtn.textContent = originalText;
+                    authBtn.disabled = false;
+                }
             });
         </script>
 
