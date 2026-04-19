@@ -289,6 +289,68 @@ export default {
         }
     }
 
+    // Handle Fetching Current User's Vents (IDOR Prevention via Session Binding)
+    if (request.method === "GET" && url.pathname === "/api/user/vents") {
+        const cookieHeader = request.headers.get('Cookie');
+        if (!cookieHeader || !cookieHeader.includes('vent_session=')) {
+            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+        }
+
+        const solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
+
+        try {
+            // Parameterized query strictly tied to the secure session cookie, not user input
+            const { results } = await env.vent_black.prepare(
+                "SELECT id, content, vent_month_year, created_at FROM vents WHERE solver_id = ? ORDER BY created_at DESC"
+            ).bind(solverId).all();
+
+            return new Response(JSON.stringify(results), {
+                status: 200,
+                headers: { ...corsHeaders, "Content-Type": "application/json" }
+            });
+        } catch (error) {
+            return new Response(JSON.stringify({ error: "Server Error" }), { status: 500, headers: corsHeaders });
+        }
+    }
+
+    // Handle Deleting a Vent (Strict Ownership Verification)
+    if (request.method === "DELETE" && url.pathname.startsWith("/api/vent/")) {
+        const cookieHeader = request.headers.get('Cookie');
+        if (!cookieHeader || !cookieHeader.includes('vent_session=')) {
+            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+        }
+
+        const solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
+        const ventId = url.pathname.split('/api/vent/')[1];
+
+        try {
+            // 1. Fetch the target vent
+            const targetVent = await env.vent_black.prepare(
+                "SELECT solver_id FROM vents WHERE id = ?"
+            ).bind(ventId).first();
+
+            if (!targetVent) {
+                return new Response(JSON.stringify({ error: "Vent not found" }), { status: 404, headers: corsHeaders });
+            }
+
+            // 2. IDOR Prevention: Check Ownership
+            if (targetVent.solver_id !== solverId) {
+                return new Response(JSON.stringify({ error: "Forbidden: You do not own this vent" }), { status: 403, headers: corsHeaders });
+            }
+
+            // 3. Authorized. Proceed with deletion.
+            await env.vent_black.prepare("DELETE FROM vents WHERE id = ?").bind(ventId).run();
+
+            return new Response(JSON.stringify({ success: true, message: "Vent deleted securely." }), { 
+                status: 200, 
+                headers: { ...corsHeaders, "Content-Type": "application/json" } 
+            });
+
+        } catch (error) {
+            return new Response(JSON.stringify({ error: "Server Error" }), { status: 500, headers: corsHeaders });
+        }
+    }
+    
     return new Response("Not Found", { status: 404 });
   }
 };
