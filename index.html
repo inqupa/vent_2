@@ -18,25 +18,8 @@
 
         <nav-bar></nav-bar>
 
-        <div style="position: absolute; 
-            top: 45%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: -1; 
-            width: 100%; 
-            text-align: center; 
-            pointer-events: none; 
-            user-select: none;">
-            <span style="font-family: 'Courier New', monospace; 
-                        font-weight: 900; 
-                        /* Gigantic scale based on screen width */
-                        font-size: 25vw; 
-                        color: var(--accent-color); 
-                        /* Increased visibility */
-                        opacity: 0.07; 
-                        letter-spacing: -1.5vw;
-                        text-transform: uppercase;
-                        line-height: 1;">
+        <div class="bg-watermark-container">
+            <span class="bg-watermark-text">
                 VENT
             </span>
         </div>
@@ -44,36 +27,17 @@
         <main id="main-content" class="hero-section">
             <div style="flex-grow: 1;"></div>
 
-            <section class="input-section glass-card" style="width: 100%; max-width: 900px; padding: 12px 20px 12px 30px; margin-bottom: 40px; display: flex; align-items: flex-end; gap: 20px;">
-                <textarea id="vent-input" autofocus placeholder="Begin typing..." aria-label="Express your thoughts here"
-                        rows="1"
-                        style="flex-grow: 1;
-                        min-height: 24px; 
-                        max-height: 300px;
-                        justify-content: center; 
-                        border: none;
-                        outline: none;
-                        background: transparent;
-                        font-size: 1.4rem;
-                        font-weight: 500;
-                        line-height: 1.4;
-                        color: var(--text-primary); 
-                        resize: none;
-                        padding: 5px 0; 
-                        -webkit-font-smoothing: antialiased;
-                        overflow-y: auto; /* script handles expansion, no scrollbar needed */
-                        scrollbar-width: none; /* firefox hide */
-                        -ms-overflow-style: none; /* IE/Edge hide */
-                        "></textarea>
+            <section class="input-section glass-card vent-input-container">
+                <textarea id="vent-input" class="vent-input-area" autofocus placeholder="Begin typing..." aria-label="Express your thoughts here" rows="1"></textarea>
                 
-                <button id="submit-vent" aria-label="Submit Vent" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; width: 60px; height: 60px; flex-shrink: 0;">
-                    <svg width="41" height="41" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="color: var(--accent-color);">
+                <button id="submit-vent" class="vent-submit-btn" aria-label="Submit Vent">
+                    <svg width="41" height="41" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="vent-submit-icon">
                         <path d="M21.5711 11.2332L4.82311 3.01217C3.86121 2.54044 2.80237 3.39329 3.09765 4.39892L5.43261 11.2501L14.9998 12.0001L5.43261 12.7501L3.09765 19.6013C2.80237 20.6069 3.86121 21.4598 4.82311 20.988L21.5711 12.767C22.143 12.486 22.143 11.5142 21.5711 11.2332Z" />
                     </svg>
                 </button>
             </section>
 
-            <footer role="contentinfo" style="padding-bottom: 20px; opacity: 0.4; font-size: 0.8rem;">
+            <footer role="contentinfo" class="footer-text">
                 <p>A safe space for your thoughts. Built by the Think Tank.</p>
             </footer>
         </main>

@@ -122,3 +122,78 @@ nav-bar {
     min-height: 40px; /* Reserves the space so the page doesn't jump */
     background: var(--nav-bg);
 }
+
+.bg-watermark-container {
+    position: absolute; 
+    top: 45%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    z-index: -1; 
+    width: 100%; 
+    text-align: center; 
+    pointer-events: none; 
+    user-select: none;
+}
+
+.bg-watermark-text {
+    font-family: 'Courier New', monospace; 
+    font-weight: 900; 
+    font-size: 25vw; 
+    color: var(--accent-color); 
+    opacity: 0.07; 
+    letter-spacing: -1.5vw;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.vent-input-container {
+    width: 100%; 
+    max-width: 900px; 
+    padding: 12px 20px 12px 30px; 
+    margin-bottom: 40px; 
+    display: flex; 
+    align-items: flex-end; 
+    gap: 20px;
+}
+
+.vent-input-area {
+    flex-grow: 1;
+    min-height: 24px; 
+    max-height: 300px;
+    justify-content: center; 
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary); 
+    resize: none;
+    padding: 5px 0; 
+    -webkit-font-smoothing: antialiased;
+    overflow-y: auto; 
+    scrollbar-width: none; /* firefox hide */
+    -ms-overflow-style: none; /* IE/Edge hide */
+}
+
+.vent-submit-btn {
+    background: none; 
+    border: none; 
+    padding: 0; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    width: 60px; 
+    height: 60px; 
+    flex-shrink: 0;
+}
+
+.vent-submit-icon {
+    color: var(--accent-color);
+}
+
+.footer-text {
+    padding-bottom: 20px; 
+    opacity: 0.4; 
+    font-size: 0.8rem;
+}
