@@ -3,6 +3,7 @@
     "core_logic": [
         "subsystems/state/state.js",
         "subsystems/db.js",
+        "subsystems/services/api.js",
         "subsystems/logic/nav-bar.js"
     ]
   },

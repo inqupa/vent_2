@@ -1,4 +1,5 @@
-// Phase 3.1 & 3.2: IndexedDB Initialization and Data Access Object (DAO)
+// subsystems/db.js
+// Phase 2: Local IndexedDB Initialization and Storage
 const DB_NAME = 'VentDataStore';
 const DB_VERSION = 1;
 
@@ -21,37 +22,7 @@ window.initDB = () => {
     });
 };
 
-// Phase 3.2: Data Access Object (DAO) Methods
-
-// Save a new vent (problem) to the database
-window.saveVent = async function(ventData) {
-    try {
-        const response = await fetch('/api/vent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ventData)
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Server rejected vent");
-
-        // Save the Vent Tracking ID locally so the anonymous ventor keeps a receipt
-        let localReceipts = JSON.parse(localStorage.getItem('my_vent_receipts') || '[]');
-        localReceipts.push({
-            trackingId: result.trackingId,
-            date: new Date().toISOString(),
-            preview: ventData.content.substring(0, 30) + '...'
-        });
-        localStorage.setItem('my_vent_receipts', JSON.stringify(localReceipts));
-
-        return result;
-    } catch (err) {
-        console.error("Database save failed:", err);
-        throw err;
-    }
-};
-
-// Retrieve all vents from the database
+// Retrieve all vents from the local database
 window.getAllVents = async () => {
     const db = await window.initDB();
     return new Promise((resolve, reject) => {
@@ -62,55 +33,4 @@ window.getAllVents = async () => {
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
-};
-
-window.getVents = async function() {
-    try {
-        const response = await fetch('/api/vents', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error("Failed to fetch vents:", err);
-        return []; // Return empty array to prevent frontend crashes
-    }
-};
-
-// Secure Data Deletion (Includes CSRF Protection)
-window.deleteVent = async function(ventId) {
-    // 1. Check if we already have a token in our cookies
-    let tokenMatch = document.cookie.match(/csrf_token=([^;]+)/);
-    let csrfToken = tokenMatch ? tokenMatch[1] : null;
-
-    // 2. If not, ask the server to generate one
-    if (!csrfToken) {
-        const res = await fetch('/api/csrf-token');
-        const data = await res.json();
-        csrfToken = data.csrfToken;
-    }
-
-    // 3. Send the sensitive request with the Token attached to the Headers
-    try {
-        const response = await fetch(`/api/vent/${ventId}`, {
-            method: 'DELETE',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken // The lock requires this key
-            }
-        });
-        
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error);
-        
-        return result;
-    } catch (err) {
-        console.error("Delete failed:", err.message);
-        return { success: false, error: err.message };
-    }
 };
