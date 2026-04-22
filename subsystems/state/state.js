@@ -82,41 +82,56 @@ function debouncedSaveState() {
 // --------------------------
 
 function createPersistentState(state) {
-    const handler = {
-        get(target, property) {
-            const value = target[property];
-            if (value && typeof value === 'object' && property !== 'subscribers') {
-                // Pass a reference to the namespace name (e.g., 'user') to the child proxy
-                return new Proxy(value, handler);
-            }
-            return value;
-        },
-        set(target, property, value) {
-            target[property] = value;
+    const MAX_DEPTH = 3; // Prevent overly deep nested state
 
-            // Phase 2.3: Improved Broadcast Logic
-            if (window.appState && window.appState.subscribers) {
-                window.appState.subscribers.forEach(sub => {
-                    // This checks if the changed property matches the subscriber's key
-                    // OR if the subscriber is watching the parent namespace
-                    if (sub.key === property || sub.key === '*' || sub.key === 'user' || sub.key === 'data' || sub.key === 'ui' || property === 'theme') {
-                        try {
-                            sub.callback(property, value);
-                        } catch (err) {
-                            console.error("Subscriber execution failed:", err);
-                        }
-                    }
-                });
-            }
-
-            // --- NEW: CALL DEBOUNCED SAVE INSTEAD ---
-            debouncedSaveState();
-
-            window.dispatchEvent(new Event('stateChange'));
-            return true;
+    function buildProxy(targetObj, currentDepth) {
+        // Structural Check 1: Prevent infinite proxy chains
+        if (currentDepth > MAX_DEPTH) {
+            console.warn(`Phase 2: State depth exceeded ${MAX_DEPTH} levels. Returning raw object.`);
+            return targetObj;
         }
-    };
-    return new Proxy(state, handler);
+
+        const handler = {
+            get(target, property) {
+                const value = target[property];
+                // Don't proxy the subscribers array or internal DOM nodes if they sneak in
+                if (value && typeof value === 'object' && property !== 'subscribers' && !Array.isArray(value)) {
+                    return buildProxy(value, currentDepth + 1);
+                }
+                return value;
+            },
+            set(target, property, value) {
+                // Structural Check 2: The Idempotency Check (Prevents Infinite Loops)
+                // Only trigger subscribers and save if the value ACTUALLY changed
+                if (target[property] === value) {
+                    return true; 
+                }
+
+                target[property] = value;
+
+                // Phase 2.3: Improved Broadcast Logic
+                if (window.appState && window.appState.subscribers) {
+                    window.appState.subscribers.forEach(sub => {
+                        if (sub.key === property || sub.key === '*' || sub.key === 'user' || sub.key === 'data' || sub.key === 'ui' || property === 'theme') {
+                            try {
+                                sub.callback(property, value);
+                            } catch (err) {
+                                console.error("Subscriber execution failed:", err);
+                            }
+                        }
+                    });
+                }
+
+                // Call the debounced save mechanism we added in Phase 1
+                debouncedSaveState();
+                window.dispatchEvent(new Event('stateChange'));
+                return true;
+            }
+        };
+        return new Proxy(targetObj, handler);
+    }
+
+    return buildProxy(state, 1);
 }
 
 // Time-Based Auto-Detection
@@ -129,7 +144,7 @@ function applyTimeTheme() {
     }
 }
 
-// Phase 1.3: Enhanced Selective Subscription Helper
+// Enhanced Selective Subscription Helper
 window.subscribeToState = (key, callback) => {
     if (typeof callback === 'function') {
         // Store the callback along with the key it cares about
