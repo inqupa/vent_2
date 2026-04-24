@@ -35,7 +35,22 @@ export function registerVentRoutes(router) {
         return new Response(JSON.stringify(results), { status: 200 });
     });
 
-    // 3. Delete a Vent
+    // 3. Fetch Current User's Vents (The missing endpoint!)
+    router.get('/api/user/vents', async (request, env) => {
+        const cookieHeader = request.headers.get('Cookie');
+        if (!cookieHeader || !cookieHeader.includes('vent_session=')) {
+            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+        }
+
+        const solverId = cookieHeader.split('vent_session=')[1].split(';')[0];
+        const { results } = await env.vent_black.prepare(
+            "SELECT id, content, vent_month_year, created_at FROM vents WHERE solver_id = ? ORDER BY created_at DESC"
+        ).bind(solverId).all();
+
+        return new Response(JSON.stringify(results), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    });
+
+    // 4. Delete a Vent
     router.delete('/api/vent/:id', async (request, env) => {
         const cookieHeader = request.headers.get('Cookie');
         if (!cookieHeader || !cookieHeader.includes('vent_session=')) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
