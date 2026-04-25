@@ -1,5 +1,4 @@
 # build artifacts
-/dist
 .vite/
 
 # miscellaneous folders
