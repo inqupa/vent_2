@@ -15,13 +15,14 @@
     "db:setup:local": "wrangler d1 execute vent_black --local --persist-to=../wrangler-data --file=./sql/01_create_solvers.sql && wrangler d1 execute vent_black --local --persist-to=../wrangler-data --file=./sql/02_create_magic_links.sql && wrangler d1 execute vent_black --local --persist-to=../wrangler-data --file=./sql/03_create_vents.sql && wrangler d1 execute vent_black --local --persist-to=../wrangler-data --file=./sql/04_create_anonymous_visitors.sql",
     "db:reset:local": "wrangler d1 execute vent_black --local --persist-to=../wrangler-data --file=./sql/00_drop_tables.sql && npm run db:setup:local",
     "db:setup:prod": "wrangler d1 execute vent_black --remote --file=./sql/01_create_solvers.sql && wrangler d1 execute vent_black --remote --file=./sql/02_create_magic_links.sql && wrangler d1 execute vent_black --remote --file=./sql/03_create_vents.sql && wrangler d1 execute vent_black --remote --file=./sql/04_create_anonymous_visitors.sql",
-    "db:reset:prod": "echo \"DANGER: Run 'wrangler d1 execute vent_black --remote --file=./sql/00_drop_tables.sql' manually if you REALLY want to destroy production data.\""   
+    "db:reset:prod": "echo \"DANGER: Run 'wrangler d1 execute vent_black --remote --file=./sql/00_drop_tables.sql' manually if you REALLY want to destroy production data.\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "eslint": "^10.2.1",
     "prettier": "^3.8.3",
     "vite": "^8.0.10"
