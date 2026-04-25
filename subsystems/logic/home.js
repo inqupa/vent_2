@@ -2,11 +2,8 @@
 const startApp = async () => {
     if ('serviceWorker' in navigator) {
         try {
-            // 1. Determine the path based on the Vite environment
-            const swPath = import.meta.env.DEV ? '/public/sw.js' : '/sw.js';
-
-            // 2. Register using the dynamic path
-            await navigator.serviceWorker.register(swPath);
+            await navigator.serviceWorker.register('/sw.js');          
+            
             console.log('Phase 3.3: Service Worker Active');
         } catch (err) {
             console.error('SW Registration Failed:', err);

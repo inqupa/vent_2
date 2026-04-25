@@ -1,4 +1,6 @@
 // subsystems/logic/user-card.js
+import userStyles from '../../skin/components/user-card.css?inline';
+
 class UserCard extends HTMLElement {
     constructor() {
         super();
@@ -47,8 +49,8 @@ class UserCard extends HTMLElement {
         const initial = userData.email.charAt(0).toUpperCase();
 
         this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="/skin/components/user-card.css">
-            <div class="header">
+        <style>${userStyles}</style>
+        <div class="header">
                 <div class="profile-picture">${initial}</div>
                 <h1 class="username">${userData.name}</h1>
                 <div class="role">Think Tank Member</div>

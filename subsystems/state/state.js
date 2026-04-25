@@ -1,4 +1,4 @@
-import defaultStateData from '../../data/default_state.json';
+import defaultStateData from '../../public/data/default_state.json';
 
 let saveTimeout = null;
 // 1. Try to load existing state from the hard drive first
