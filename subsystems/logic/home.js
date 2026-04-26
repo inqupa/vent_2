@@ -2,8 +2,10 @@
 const startApp = async () => {
     if ('serviceWorker' in navigator) {
         try {
-            await navigator.serviceWorker.register('/sw.js');          
-            
+            await navigator.serviceWorker.register('/sw.js', {
+                type: import.meta.env.DEV ? 'module' : 'classic'
+            });
+
             console.log('Phase 3.3: Service Worker Active');
         } catch (err) {
             console.error('SW Registration Failed:', err);
